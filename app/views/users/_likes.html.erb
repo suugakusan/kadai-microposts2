@@ -1,0 +1,34 @@
+<% if favoritings.any? %>
+  <ul class="list-unstyled mt-2">
+    <% favoritings.each do |favorite| %>
+      <li class="d-flex">
+        <img class="rounded me-2 mb-5" src="<%= gravatar_url(favorite.user, { size: 64 }) %>" alt="">
+        <div>
+          <div>
+            <%= link_to favorite.user.name, user_path(favorite.user), class: "text-decoration-none" %> <span class="text-muted">posted at <%= favorite.created_at %></span>
+          </div>
+          <div>
+            <p><%= favorite.content %></p>
+          </div>
+          <div class="d-flex">
+           <% if current_user == favorite.user %>
+              <%= link_to "Delete", favorite, method: :delete, data: { confirm: "You sure?" }, class: 'btn btn-danger btn-sm' %>
+            <% end %>
+            <% if current_user.favoriting?(favorite) %>
+              <%= form_with(model: current_user.favorites.find_by(micropost_id: favorite.id),  method: :delete) do |f| %>
+              <%= hidden_field_tag :micropost_id, favorite.id %>
+                <%= f.submit 'unfavorite', class: 'btn btn-danger btn-sm ' %>
+              <% end %>
+            <% else %>
+               <%= form_with(model: current_user.favorites.build) do |f| %>
+                <%= hidden_field_tag :micropost_id, favorite.id %>
+                <%= f.submit 'favorite', class: 'btn btn-primary btn-sm ' %>
+               <% end %>
+            <% end %>
+          </div>
+        </div>
+      </li>
+    <% end %>
+  </ul>
+  <%== pagy_bootstrap_nav(@pagy) %>
+<% end %>
